@@ -8,6 +8,9 @@
 [![Rust](https://img.shields.io/badge/rust-v1.75+-blue.svg?logo=rust)](https://www.rust-lang.org/)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20%7C%20Server-blue.svg)]()
 [![Hardware: NPU/DirectML](https://img.shields.io/badge/Hardware-DirectML%20%7C%20NPU%20%7C%20CUDA-orange.svg)]()
+[![Build Status](https://img.shields.io/github/actions/workflow/status/CharleGutierrez/lomi-for-windows/ci.yml?branch=main&logo=github)](https://github.com/CharleGutierrez/lomi-for-windows/actions)
+[![GitHub stars](https://img.shields.io/github/stars/CharleGutierrez/lomi-for-windows?style=social)](https://github.com/CharleGutierrez/lomi-for-windows/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Lomi for Windows** is a high-speed, zero-cost AI Gateway written entirely in Rust, rebuilt from the ground up for the Windows ecosystem. It intercepts API requests from your favorite AI tools (Pi, Cursor, LangChain) via Zero-Latency Named Pipes or TCP, and dynamically routes them to local NPUs or cloud providers while applying extreme token minification, caching, and enterprise-grade sandboxing.
 
