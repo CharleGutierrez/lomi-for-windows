@@ -87,6 +87,78 @@ To force Lomi to block all Anthropic/OpenAI API requests and strictly use local 
 When this flag is detected, Lomi will route all traffic to `qwen2.5-coder-7b (Air-Gapped)` guaranteeing 100% data security.
 
 ---
+
+## 📈 Dynamic Hardware Scaling Benchmarks
+
+Lomi's tuning engine automatically evaluates your system hardware pool upon initialization, scaling from legacy laptops to massive Enterprise Clusters. Here are the live optimization resolutions across 5 different hardware classes:
+
+```text
+⚙️ LOMI: Initializing Hardware Optimizer Benchmarks
+
+------------------------------------------------------------
+🖥️  PROFILE: 7TH GEN OFFICE LAPTOP
+   - Compute: Intel Core i5-7200U (2 Cores)
+   - Memory : 8 GB RAM
+   - Accel. : None (Integrated)
+
+   ⚡ LOMI TUNING ENGINE RESOLUTION:
+      └ Target Device : CPU
+      └ Quantization  : GGUF 8-bit (AVX2)
+      └ Max Threads   : 1 / 2
+      └ Batch Size    : 4
+      └ Ctx Window    : 2048 tokens
+------------------------------------------------------------
+🖥️  PROFILE: 12TH GEN THIN-AND-LIGHT
+   - Compute: Intel Core i7-1260P (12 Cores)
+   - Memory : 16 GB RAM
+   - Accel. : Intel Iris Xe (0 GB VRAM)
+
+   ⚡ LOMI TUNING ENGINE RESOLUTION:
+      └ Target Device : CPU
+      └ Quantization  : GGUF 8-bit (AVX2)
+      └ Max Threads   : 11 / 12
+      └ Batch Size    : 8
+      └ Ctx Window    : 8192 tokens
+------------------------------------------------------------
+🖥️  PROFILE: LATEST APPLE SILICON
+   - Compute: Apple M3 Max (16 Cores)
+   - Memory : 128 GB RAM
+   - Accel. : Apple Metal Unified GPU (128 GB VRAM)
+
+   ⚡ LOMI TUNING ENGINE RESOLUTION:
+      └ Target Device : Metal Performance Shaders (MPS)
+      └ Quantization  : QLoRA 4-bit (DirectML/NF4)
+      └ Max Threads   : 15 / 16
+      └ Batch Size    : 64
+      └ Ctx Window    : 32768 tokens
+------------------------------------------------------------
+🖥️  PROFILE: MODERN GAMING/AI DESKTOP
+   - Compute: AMD Ryzen 9 7950X3D (16 Cores)
+   - Memory : 64 GB RAM
+   - Accel. : NVIDIA RTX 4090 (24 GB VRAM)
+
+   ⚡ LOMI TUNING ENGINE RESOLUTION:
+      └ Target Device : DirectX 12 / DirectML (Windows NPU)
+      └ Quantization  : QLoRA 4-bit (DirectML/NF4)
+      └ Max Threads   : 15 / 16
+      └ Batch Size    : 16
+      └ Ctx Window    : 8192 tokens
+------------------------------------------------------------
+🖥️  PROFILE: ENTERPRISE AI SERVER
+   - Compute: Dual AMD EPYC 9654 (192 Cores)
+   - Memory : 1536 GB RAM
+   - Accel. : 8x NVIDIA H100 SXM5 (640 GB VRAM)
+
+   ⚡ LOMI TUNING ENGINE RESOLUTION:
+      └ Target Device : DirectX 12 / DirectML (Windows NPU)
+      └ Quantization  : BFloat16 (Uncompressed)
+      └ Max Threads   : 191 / 192
+      └ Batch Size    : 256
+      └ Ctx Window    : 128000 tokens
+------------------------------------------------------------
+```
+
+---
 <div align="center">
 <i>Engineered for Windows 11. Built with ❤️ by Cognitive Agents.</i>
 </div>

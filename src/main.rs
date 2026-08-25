@@ -313,7 +313,7 @@ fn ai_tuner_optimize(model_config: &HfConfig) -> (HyperParams, String) {
         batch_size,
         lora_rank,
         optimizer: "AdamW8bit".to_string(),
-        quantization: if is_gpu { "QLoRA 4-bit (NF4)".to_string() } else { "GGUF 8-bit".to_string() },
+        quantization: if is_gpu { "QLoRA 4-bit (DirectML/NF4)".to_string() } else { "GGUF 8-bit (AVX2)".to_string() },
         context_window,
         device_type: if is_gpu { "CUDA".to_string() } else { "CPU".to_string() },
     };
@@ -621,12 +621,12 @@ fn simulate_hardware_optimization(name: &str, cpu_brand: &str, cores: usize, ram
     let num_threads = if cores > 2 { cores - 1 } else { 1 };
     
     let device = if is_gpu && gpu_name.contains("Apple") { "Metal Performance Shaders (MPS)" }
-                 else if is_gpu { "CUDA / TensorRT" } 
+                 else if is_gpu { "DirectX 12 / DirectML (Windows NPU)" } 
                  else { "CPU" };
                  
     let quant = if is_gpu && memory_pool >= 320 { "BFloat16 (Uncompressed)" } 
-                else if is_gpu { "QLoRA 4-bit (NF4)" } 
-                else { "GGUF 8-bit" };
+                else if is_gpu { "QLoRA 4-bit (DirectML/NF4)" } 
+                else { "GGUF 8-bit (AVX2)" };
 
     println!("🖥️  PROFILE: {}", name.to_uppercase());
     println!("   - Compute: {} ({} Cores)", cpu_brand, cores);
