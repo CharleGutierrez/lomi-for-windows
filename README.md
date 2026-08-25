@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="assets/logo.svg" alt="LOMI AGI for Windows" width="600">
+<img src="assets/logo-dark.svg#gh-dark-mode-only" alt="LOMI AGI for Windows" width="600">
+<img src="assets/logo-light.svg#gh-light-mode-only" alt="LOMI AGI for Windows" width="600">
 
 **The Ultimate AGI Operating System & Local Universal API Gateway**
 
