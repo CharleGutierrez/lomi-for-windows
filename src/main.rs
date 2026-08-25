@@ -105,7 +105,7 @@ struct HyperParams {
     lora_rank: usize,
     optimizer: String,
     quantization: String,
-    _context_window: usize,
+    context_window: usize,
     device_type: String,
 }
 
@@ -244,7 +244,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Parses the dataset, simulates tokenization, and returns number of batches
-fn process_dataset(path: &str, batch_size: usize, _context_window: usize) -> u32 {
+fn process_dataset(path: &str, batch_size: usize, context_window: usize) -> u32 {
     let mut num_lines = 0;
     if Path::new(path).exists() {
         if let Ok(file) = File::open(path) {
@@ -373,7 +373,7 @@ fn spawn_tuning_engine(architecture: String, params: HyperParams, hardware: Stri
 
 fn run_tui_loop<B: ratatui::backend::Backend>(
     terminal: &mut Terminal<B>,
-    app: AppState,
+    mut app: AppState,
     rx: mpsc::Receiver<TuiUpdate>
 ) -> std::io::Result<Option<TuningSessionStats>> {
     let mut global_step_counter = 0.0;
@@ -414,7 +414,7 @@ fn run_tui_loop<B: ratatui::backend::Backend>(
     Ok(app.final_stats)
 }
 
-fn run_headless_loop(app: AppState, rx: mpsc::Receiver<TuiUpdate>) -> std::io::Result<Option<TuningSessionStats>> {
+fn run_headless_loop(mut app: AppState, rx: mpsc::Receiver<TuiUpdate>) -> std::io::Result<Option<TuningSessionStats>> {
     println!("⚙️ HW: {} | Mode: {}", app.hardware, app.params.device_type);
     loop {
         if let Ok(update) = rx.recv() {
@@ -642,6 +642,16 @@ fn simulate_hardware_optimization(name: &str, cpu_brand: &str, cores: usize, ram
     println!("      └ Max Threads   : {} / {}", num_threads, cores);
     println!("      └ Batch Size    : {}", batch_size);
     println!("      └ Ctx Window    : {} tokens", context_window);
+    
+    // Omni-Tuner boundaries based on hardware
+    let max_vault_ram = (ram_gb as f64 * 0.25 * 1024.0) as u64; // Max 25% of RAM for Sandbox
+    let max_draft_tokens = if cores >= 16 { 8 } else if cores >= 8 { 5 } else { 2 };
+    let etw_lookback = if ram_gb >= 64 { "Unlimited (Deep Diagnostics)" } else if ram_gb >= 16 { "30 Minutes" } else { "5 Minutes (Conserving RAM)" };
+    
+    println!("\n   🧠 OMNI-TUNER HARDWARE CAP RESOLUTION:");
+    println!("      └ Sandbox Job Object Max  : {} MB", max_vault_ram);
+    println!("      └ Speculative Draft Limit : {} Tokens Ahead", max_draft_tokens);
+    println!("      └ ETW Vector RAG Lookback : {}", etw_lookback);
     println!("------------------------------------------------------------");
 }
 
