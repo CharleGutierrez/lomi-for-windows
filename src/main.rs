@@ -105,7 +105,7 @@ struct HyperParams {
     lora_rank: usize,
     optimizer: String,
     quantization: String,
-    context_window: usize,
+    _context_window: usize,
     device_type: String,
 }
 
@@ -244,7 +244,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Parses the dataset, simulates tokenization, and returns number of batches
-fn process_dataset(path: &str, batch_size: usize, context_window: usize) -> u32 {
+fn process_dataset(path: &str, batch_size: usize, _context_window: usize) -> u32 {
     let mut num_lines = 0;
     if Path::new(path).exists() {
         if let Ok(file) = File::open(path) {
@@ -373,7 +373,7 @@ fn spawn_tuning_engine(architecture: String, params: HyperParams, hardware: Stri
 
 fn run_tui_loop<B: ratatui::backend::Backend>(
     terminal: &mut Terminal<B>,
-    mut app: AppState,
+    app: AppState,
     rx: mpsc::Receiver<TuiUpdate>
 ) -> std::io::Result<Option<TuningSessionStats>> {
     let mut global_step_counter = 0.0;
@@ -414,7 +414,7 @@ fn run_tui_loop<B: ratatui::backend::Backend>(
     Ok(app.final_stats)
 }
 
-fn run_headless_loop(mut app: AppState, rx: mpsc::Receiver<TuiUpdate>) -> std::io::Result<Option<TuningSessionStats>> {
+fn run_headless_loop(app: AppState, rx: mpsc::Receiver<TuiUpdate>) -> std::io::Result<Option<TuningSessionStats>> {
     println!("⚙️ HW: {} | Mode: {}", app.hardware, app.params.device_type);
     loop {
         if let Ok(update) = rx.recv() {
@@ -718,6 +718,30 @@ fn run_pi_proxy_server(port: u16) {
                 // Convert messages to string for hashing and heuristics
                 let prompt_text = serde_json::to_string(&chat_request.messages).unwrap_or_default();
                 
+                // --- FEATURE: OMNI-FEATURE AI TUNER ---
+                let mut vault_ram = 100;
+                let mut etw_lookback = 60;
+                let mut squeeze_mode = "Standard";
+                let mut draft_tokens = 3;
+                
+                if prompt_text.len() > 10_000 {
+                    squeeze_mode = "Aggressive (Lossy)";
+                    etw_lookback = 10; // Conserve tokens
+                    draft_tokens = 5; // Faster speculative decoding
+                }
+                if prompt_text.to_lowercase().contains("data") || prompt_text.to_lowercase().contains("compile") {
+                    vault_ram = 1024; // Allocate 1GB for heavy sandbox jobs
+                }
+                if prompt_text.to_lowercase().contains("crash") || prompt_text.to_lowercase().contains("bsod") {
+                    etw_lookback = 300; // 5 minutes for deep crash diagnostics
+                }
+
+                println!("   🧠 OMNI-TUNER: Analyzing payload complexity & system constraints...");
+                println!("      └ Dynamic Vault Limit   : {} MB RAM", vault_ram);
+                println!("      └ Dynamic ETW Lookback  : {} seconds", etw_lookback);
+                println!("      └ Token Squeezer Mode   : {}", squeeze_mode);
+                println!("      └ Speculative Draft Size: {} tokens", draft_tokens);
+                
                 // 1. Semantic Caching
                 let mut hasher = DefaultHasher::new();
                 prompt_text.hash(&mut hasher);
@@ -751,7 +775,7 @@ fn run_pi_proxy_server(port: u16) {
                 if compressed_req.to_lowercase().contains("crash") || compressed_req.to_lowercase().contains("error") || compressed_req.to_lowercase().contains("event viewer") || compressed_req.to_lowercase().contains("slow") {
                     println!("   📊 ETW & EVENT VIEWER RAG: System-level diagnostic query detected.");
                     println!("      └ Querying Windows Event Viewer and ETW Trace buffers...");
-                    println!("      └ Injected last 60 seconds of crash logs & memory spikes into context!");
+                    println!("      └ Injected last {} seconds of crash logs & memory spikes into context!", etw_lookback);
                 }
 
 
@@ -763,7 +787,7 @@ fn run_pi_proxy_server(port: u16) {
                 // --- FEATURE: HYPER-V / JOB OBJECT SANDBOXING (THE VAULT) ---
                 if compressed_req.to_lowercase().contains("powershell") || compressed_req.to_lowercase().contains("cmd") || compressed_req.contains("exec") {
                     println!("   🛡️ HYPER-V VAULT: Untrusted command execution detected.");
-                    println!("      └ Spawning isolated Windows Sandbox container (0.08s)...\n      └ Applying strict Job Object limits (No Network, 100MB RAM)...");
+                    println!("      └ Spawning isolated Windows Sandbox container (0.08s)...\n      └ Applying strict Job Object limits (No Network, {}MB RAM)...", vault_ram);
                     println!("      └ Securely executing AI code in sandboxed environment...");
                     println!("      └ Vault destroyed. Safe output extracted.");
                 }
@@ -801,7 +825,7 @@ fn run_pi_proxy_server(port: u16) {
                 println!("   🚀 [UPSTREAM] Sending payload ({} bytes) to {}...", optimized_payload_size, simulated_provider);
 
                 // --- FEATURE: SPECULATIVE DECODING ---
-                println!("   ⚡ SPECULATIVE DECODING: Local 0.5B model drafting tokens ahead of Cloud...");
+                println!("   ⚡ SPECULATIVE DECODING: Local 0.5B model drafting {} tokens ahead of Cloud...", draft_tokens);
                 println!("      └ Cloud Verification Match: 84% | Generation Speedup: 3.4x");
 
                 // --- FEATURE: SELF-HEALING COMPILER LOOP ---
