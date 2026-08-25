@@ -23,11 +23,25 @@
     </filter>
   </defs>
 
+  <style>
+    /* Default (GitHub Light Theme) */
+    .text-main { fill: #0F172A; }
+    .text-tagline { fill: #475569; }
+    .bg-link { stroke: #CBD5E1; }
+    
+    /* Dynamic switch to GitHub Dark Theme */
+    @media (prefers-color-scheme: dark) {
+      .text-main { fill: #F8FAFC; }
+      .text-tagline { fill: #94A3B8; }
+      .bg-link { stroke: #1E293B; }
+    }
+  </style>
+
   <!-- Left Icon Area -->
   <g transform="translate(100, 60)" filter="url(#glow)">
     
     <!-- Deep Network Links -->
-    <path d="M 75 10 L 140 75 L 75 140 L 10 75 Z" fill="none" stroke="#1E293B" stroke-width="2" />
+    <path class="bg-link" d="M 75 10 L 140 75 L 75 140 L 10 75 Z" fill="none" stroke-width="2" />
     
     <!-- Connecting Synapses -->
     <line x1="10" y1="75" x2="60" y2="75" stroke="#38BDF8" stroke-width="3" opacity="0.4"/>
@@ -54,13 +68,13 @@
   <!-- Branding / Typography -->
   <g transform="translate(320, 150)">
     <!-- Main LOMI Text -->
-    <text x="0" y="0" font-family="'Segoe UI', -apple-system, Roboto, sans-serif" font-size="80" font-weight="900" fill="#F8FAFC" letter-spacing="4">LOMI</text>
+    <text class="text-main" x="0" y="0" font-family="'Segoe UI', -apple-system, Roboto, sans-serif" font-size="80" font-weight="900" letter-spacing="4">LOMI</text>
     
-    <!-- Sub Brand -->
+    <!-- Sub Brand (Always glowing cyan) -->
     <text x="235" y="0" font-family="'Segoe UI', -apple-system, Roboto, sans-serif" font-size="80" font-weight="200" fill="url(#glowGradient)" filter="url(#textGlow)">AGI</text>
     
     <!-- OS Tagline -->
-    <text x="5" y="45" font-family="'Consolas', 'Courier New', monospace" font-size="24" font-weight="600" fill="#94A3B8" letter-spacing="9">FOR WINDOWS</text>
+    <text class="text-tagline" x="5" y="45" font-family="'Consolas', 'Courier New', monospace" font-size="24" font-weight="600" letter-spacing="9">FOR WINDOWS</text>
     
     <!-- Accent line -->
     <rect x="5" y="65" width="60" height="4" rx="2" fill="#00C4FF" />
