@@ -1,6 +1,7 @@
 <div align="center">
 
-# 🪟 Lomi for Windows
+<img src="assets/logo.svg" alt="LOMI AGI for Windows" width="600">
+
 **The Ultimate AGI Operating System & Local Universal API Gateway**
 
 [![Rust](https://img.shields.io/badge/rust-v1.75+-blue.svg?logo=rust)](https://www.rust-lang.org/)

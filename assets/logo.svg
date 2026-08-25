@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="800" height="300">
+  <defs>
+    <!-- Windows Native Blue to Cyan AI Gradient -->
+    <linearGradient id="winBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00C4FF" />
+      <stop offset="100%" stop-color="#005A9E" />
+    </linearGradient>
+    
+    <linearGradient id="glowGradient" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#3B82F6" />
+    </linearGradient>
+
+    <!-- Neural Network Node Glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="textGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Left Icon Area -->
+  <g transform="translate(100, 60)" filter="url(#glow)">
+    
+    <!-- Deep Network Links -->
+    <path d="M 75 10 L 140 75 L 75 140 L 10 75 Z" fill="none" stroke="#1E293B" stroke-width="2" />
+    
+    <!-- Connecting Synapses -->
+    <line x1="10" y1="75" x2="60" y2="75" stroke="#38BDF8" stroke-width="3" opacity="0.4"/>
+    <line x1="140" y1="75" x2="90" y2="75" stroke="#38BDF8" stroke-width="3" opacity="0.4"/>
+    <line x1="75" y1="10" x2="75" y2="60" stroke="#38BDF8" stroke-width="3" opacity="0.4"/>
+    <line x1="75" y1="140" x2="75" y2="90" stroke="#38BDF8" stroke-width="3" opacity="0.4"/>
+
+    <!-- Neural Nodes -->
+    <circle cx="75" cy="10" r="6" fill="#00C4FF" />
+    <circle cx="140" cy="75" r="6" fill="#00C4FF" />
+    <circle cx="75" cy="140" r="6" fill="#00C4FF" />
+    <circle cx="10" cy="75" r="6" fill="#00C4FF" />
+    
+    <!-- Central Holographic Shield -->
+    <path d="M 75 30 L 120 75 L 75 120 L 30 75 Z" fill="none" stroke="url(#glowGradient)" stroke-width="6" />
+
+    <!-- Core: Evolving Windows Logo -->
+    <rect x="62" y="62" width="12" height="12" rx="2" fill="url(#winBlue)" />
+    <rect x="76" y="62" width="12" height="12" rx="2" fill="url(#winBlue)" />
+    <rect x="62" y="76" width="12" height="12" rx="2" fill="url(#winBlue)" />
+    <rect x="76" y="76" width="12" height="12" rx="2" fill="url(#winBlue)" />
+  </g>
+
+  <!-- Branding / Typography -->
+  <g transform="translate(320, 150)">
+    <!-- Main LOMI Text -->
+    <text x="0" y="0" font-family="'Segoe UI', -apple-system, Roboto, sans-serif" font-size="80" font-weight="900" fill="#F8FAFC" letter-spacing="4">LOMI</text>
+    
+    <!-- Sub Brand -->
+    <text x="235" y="0" font-family="'Segoe UI', -apple-system, Roboto, sans-serif" font-size="80" font-weight="200" fill="url(#glowGradient)" filter="url(#textGlow)">AGI</text>
+    
+    <!-- OS Tagline -->
+    <text x="5" y="45" font-family="'Consolas', 'Courier New', monospace" font-size="24" font-weight="600" fill="#94A3B8" letter-spacing="9">FOR WINDOWS</text>
+    
+    <!-- Accent line -->
+    <rect x="5" y="65" width="60" height="4" rx="2" fill="#00C4FF" />
+  </g>
+</svg>
