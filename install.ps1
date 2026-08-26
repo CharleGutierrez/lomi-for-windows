@@ -17,9 +17,11 @@ if (!(Test-Path -Path $InstallDir)) {
     New-Item -ItemType Directory -Path $InstallDir | Out-Null
 }
 
-# 2. Copy Executable
+# 2. Build and Copy Executable
+Write-Host "   └ Compiling Release Binary..."
+cargo build --release
 Write-Host "   └ Copying lomi-win.exe to $InstallDir..."
-Copy-Item ".\lomi-win.exe" -Destination "$InstallDir\lomi-win.exe" -Force
+Copy-Item ".\target\release\lomi-win.exe" -Destination "$InstallDir\lomi-win.exe" -Force
 
 # 3. Generate Task Scheduler XML
 $xmlContent = @"
