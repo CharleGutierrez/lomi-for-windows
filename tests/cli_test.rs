@@ -70,17 +70,17 @@ fn test_cmd_web_agent() {
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind server");
     let port = listener.local_addr().unwrap().port();
     thread::spawn(move || {
-        for _ in 0..10 {
-            if let Ok((mut stream, _)) = listener.accept() {
-                let body = "<html><body><h1>Lomi Test Page</h1></body></html>";
-                let response = format!(
-                    "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\nContent-Length: {}\r\n\r\n{}",
-                    body.len(), body
-                );
-                let _ = stream.write_all(response.as_bytes());
-                let _ = stream.flush();
-                break;
-            }
+        use std::io::Read;
+        while let Ok((mut stream, _)) = listener.accept() {
+            let mut buf = [0u8; 1024];
+            let _ = stream.read(&mut buf);
+            let body = "<html><body><h1>Lomi Test Page</h1></body></html>";
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\nContent-Length: {}\r\n\r\n{}",
+                body.len(), body
+            );
+            let _ = stream.write_all(response.as_bytes());
+            let _ = stream.flush();
         }
     });
 
