@@ -27,6 +27,9 @@ reqwest = { version = "0.12", features = ["blocking"] }
 scraper = "0.19"
 dirs = "5.0"
 device_query = "2.1.0"
+notify = "8.2.0"
+mdns-sd = "0.21.0"
+cudarc = { version = "0.19.9", optional = true }
 [target.'cfg(windows)'.dependencies]
 windows-service = "0.7"
 tray-item = "0.10.0"
@@ -45,3 +48,7 @@ windows = { version = "0.52", features = [
     "Win32_Security"
 ] }
 winreg = "0.52"
+
+[features]
+cudarc = ["dep:cudarc"]
+cuda = ["cudarc"]
