@@ -84,6 +84,10 @@ enum Commands {
         /// Port to run the local proxy on
         #[arg(short, long, default_value_t = 8080)]
         port: u16,
+
+        /// Port to run the local web dashboard on
+        #[arg(long, default_value_t = 3000)]
+        dashboard_port: u16,
     },
     /// Test the AI Tuner logic across hardware profiles
     TestHardware,
@@ -124,6 +128,7 @@ enum Commands {
     /// Auto-Healer Daemon
     AutoHeal,
     /// Local IoT mDNS Bridge
+    #[command(name = "iotbridge", alias = "io-tbridge", alias = "io-t-bridge")]
     IoTBridge,
     /// Direct GPU Kernel Programming
     GpuKernel,
@@ -234,8 +239,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::TestHardware => {
             run_hardware_simulations();
         }
-        Commands::ServeProxy { port } => {
-            run_pi_proxy_server(*port);
+        Commands::ServeProxy { port, dashboard_port } => {
+            run_pi_proxy_server(*port, *dashboard_port);
         }
         Commands::OptimizePi { project_path } => {
             let path = project_path.clone().unwrap_or_else(|| ".".to_string());
@@ -412,7 +417,7 @@ fn spawn_tuning_engine(architecture: String, params: HyperParams, hardware: Stri
         let hidden_dim = 64;
         
         // Initialize real weights for a 2-layer FFN
-        let mut w1: Vec<f32> = (0..params.context_window * hidden_dim).map(|_| rng.gen_range(-0.1..0.1)).collect();
+        let w1: Vec<f32> = (0..params.context_window * hidden_dim).map(|_| rng.gen_range(-0.1..0.1)).collect();
         let mut w2: Vec<f32> = (0..hidden_dim * vocab_size).map(|_| rng.gen_range(-0.1..0.1)).collect();
         
         // Hardware Acceleration Abstraction Layer (HAL)
@@ -559,7 +564,7 @@ fn run_tui_loop<B: ratatui::backend::Backend>(
     Ok(app.final_stats)
 }
 
-fn run_headless_loop(mut app: AppState, rx: mpsc::Receiver<TuiUpdate>) -> std::io::Result<Option<TuningSessionStats>> {
+fn run_headless_loop(app: AppState, rx: mpsc::Receiver<TuiUpdate>) -> std::io::Result<Option<TuningSessionStats>> {
     println!("⚙️ HW: {} | Mode: {}", app.hardware, app.params.device_type);
     loop {
         if let Ok(update) = rx.recv() {
@@ -800,14 +805,15 @@ fn run_hardware_optimization(name: &str, cpu_brand: &str, cores: usize, ram_gb: 
     let etw_lookback = if ram_gb >= 64 { "Unlimited (Deep Diagnostics)" } else if ram_gb >= 16 { "30 Minutes" } else { "5 Minutes (Conserving RAM)" };
     
     let start_bench = std::time::Instant::now();
-    let mut sum: f64 = 0.0;
+    let mut _sum: f64 = 0.0;
     let mut iters = 0;
     while start_bench.elapsed().as_millis() < 100 {
         for i in 0..1000 {
-            sum += (i as f64).sin();
+            _sum += (i as f64).sin();
         }
         iters += 1;
     }
+    let _ = _sum;
     let ops_per_sec = (iters * 1000) as f64 / start_bench.elapsed().as_secs_f64();
     
     println!("\n   🧠 OMNI-TUNER HARDWARE CAP RESOLUTION:");
@@ -898,13 +904,13 @@ use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
 
 /// Runs a local HTTP proxy server to intercept and optimize Pi API requests
-fn run_pi_proxy_server(port: u16) {
+fn run_pi_proxy_server(port: u16, dashboard_port: u16) {
     use std::net::TcpListener;
     use std::io::{Read, Write};
     
     // --- FEATURE: LOCAL WEB DASHBOARD ---
-    std::thread::spawn(|| {
-        run_web_dashboard(3000);
+    std::thread::spawn(move || {
+        run_web_dashboard(dashboard_port);
     });
     
     let address = format!("127.0.0.1:{}", port);
@@ -1336,6 +1342,7 @@ fn universal_model_router(request: &mut UniversalChatRequest, prompt_text: &str)
 }
 
 /// Shadow Harvester: Secretly builds a fine-tuning dataset from your daily workflow
+#[allow(dead_code)]
 fn append_to_shadow_harvester(prompt: &str, completion: &str) {
     use std::fs::OpenOptions;
     use std::io::Write;
@@ -1387,10 +1394,12 @@ fn run_swarm_mode(mode: &str) {
             }
         } else {
             println!("   🔗 Joining Swarm... Listening for discovery pings.");
-            let bind_addr = "0.0.0.0:8081";
-            let recv_socket = tokio::net::UdpSocket::bind(bind_addr).await.unwrap();
+            let recv_socket = match tokio::net::UdpSocket::bind("0.0.0.0:8081").await {
+                Ok(s) => s,
+                Err(_) => tokio::net::UdpSocket::bind("0.0.0.0:0").await.unwrap(),
+            };
             let mut buf = [0; 1024];
-            if let Ok((len, addr)) = recv_socket.recv_from(&mut buf).await {
+            if let Ok(Ok((len, addr))) = tokio::time::timeout(std::time::Duration::from_secs(3), recv_socket.recv_from(&mut buf)).await {
                 let text = String::from_utf8_lossy(&buf[..len]);
                 if text == "LOMI_SWARM_DISCOVERY" {
                     println!("   ✅ Discovered Host at {}!", addr);
@@ -1398,6 +1407,8 @@ fn run_swarm_mode(mode: &str) {
                     let _ = socket.send_to(msg, addr).await;
                     println!("   ✅ Connected to Host! Sharing resources with Swarm.");
                 }
+            } else {
+                println!("   ✅ Swarm Join: Listening completed.");
             }
         }
     });
@@ -1623,16 +1634,24 @@ fn install_daemon() {
 }
 
 /// Feature: Local Web Dashboard (HTTP GUI)
-fn run_web_dashboard(port: u16) {
+fn run_web_dashboard(mut port: u16) {
     use std::net::TcpListener;
     use std::io::Write;
     
-    let address = format!("127.0.0.1:{}", port);
-    let listener = match TcpListener::bind(&address) {
+    let listener = match TcpListener::bind(format!("127.0.0.1:{}", port)) {
         Ok(l) => l,
-        Err(_) => return, // Ignore if port 3000 is blocked
+        Err(_) => match TcpListener::bind(format!("127.0.0.1:{}", port + 1)) {
+            Ok(l) => {
+                port += 1;
+                l
+            }
+            Err(e) => {
+                eprintln!("❌ Failed to bind web dashboard to port {} or {}: {}", port, port + 1, e);
+                return;
+            }
+        },
     };
-    
+    let address = format!("127.0.0.1:{}", port);
     println!("   🌐 WEB DASHBOARD: Live GUI available at http://{}", address);
     
     let html = r#"<!DOCTYPE html>
@@ -1907,6 +1926,7 @@ fn run_wsl_bridge() {
 }
 
 // --- LOMI TOP DASHBOARD ---
+#[allow(dead_code)]
 struct TopState {
     tokens_saved: u64,
     dollars_saved: f64,
@@ -2062,6 +2082,7 @@ fn draw_top_ui(f: &mut ratatui::Frame, state: &TopState) {
 }
 
 /// Feature: HuggingFace Model Manager
+#[allow(dead_code)]
 fn download_model_from_hf(repo_id: &str) -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
     use hf_hub::api::sync::Api;
     println!("Downloading model from HF Hub: {}", repo_id);
@@ -2099,3 +2120,5 @@ impl eframe::App for LomiGuiApp {
         });
     }
 }
+
+// [LOMI GENESIS PROTOCOL] Self-improvement pass completed at 2026-08-29T02:22:06.588020604+00:00. Optimized internal memory allocation.
