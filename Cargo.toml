@@ -20,6 +20,12 @@ memmap2 = "0.9.3"
 eframe = "0.27"
 tokio = { version = "1.37", features = ["full"] }
 walkdir = "2.5.0"
+global-hotkey = "0.3"
+cpal = "0.15"
+enigo = "0.2"
+reqwest = { version = "0.12", features = ["blocking"] }
+scraper = "0.19"
+dirs = "5.0"
 [target.'cfg(windows)'.dependencies]
 windows-service = "0.7"
 tray-item = "0.10.0"
