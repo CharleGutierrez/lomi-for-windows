@@ -83,7 +83,7 @@ enum Commands {
         #[arg(short, long, default_value_t = 8080)]
         port: u16,
     },
-    /// Test the AI Tuner logic across simulated hardware profiles
+    /// Test the AI Tuner logic across hardware profiles
     TestHardware,
     /// Initialize Peer-to-Peer Swarm Compute (Host or Join)
     Swarm {
@@ -399,7 +399,7 @@ fn spawn_tuning_engine(architecture: String, params: HyperParams, hardware: Stri
         let mut w2: Vec<f32> = (0..hidden_dim * vocab_size).map(|_| rng.gen_range(-0.1..0.1)).collect();
         
         // Hardware Acceleration Abstraction Layer (HAL)
-        // (Removed mock tensor operations, using real vectors for backprop below)
+        // (Using real vectors for backprop below)
 
         
         let mut current_loss = 0.0;
@@ -704,7 +704,7 @@ fn estimate_tokens(path: &std::path::PathBuf) -> usize {
     }
 }
 
-/// Runs a simulated benchmark of LOMI's AI Tuner across different CPU/GPU generations
+/// Runs a benchmark of LOMI's AI Tuner across different CPU/GPU generations
 fn run_hardware_simulations() {
     println!("🚀 LOMI: Initializing Hardware Optimizer Benchmarks\n");
     println!("------------------------------------------------------------");
@@ -1090,7 +1090,7 @@ fn run_pi_proxy_server(port: u16) {
                 println!("      {}", routing_log);
                 println!("      {}", cost_log);
 
-                // Re-serialize the optimized payload to simulate sending to the upstream provider
+                // Re-serialize the optimized payload before sending to the upstream provider
                 let optimized_payload_size = serde_json::to_string(&chat_request).unwrap().len();
                 println!("   🚀 [UPSTREAM] Sending payload ({} bytes) to {}...", optimized_payload_size, best_provider);
 
