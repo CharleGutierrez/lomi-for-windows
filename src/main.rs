@@ -1743,7 +1743,7 @@ fn run_lomi_top() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     let mut sys = sysinfo::System::new_all();
-    let mut networks = sysinfo::Networks::new_with_resolved_names();
+    let mut networks = sysinfo::Networks::new_with_refreshed_list();
 
     enable_raw_mode()?;
     let mut stdout = std::io::stdout();
