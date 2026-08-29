@@ -1,0 +1,10 @@
+/home/cog/Pi Assisted Projects/lomi_win/target/debug/deps/accesskit_consumer-6cc27453daf6c1eb.d: /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/lib.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/tree.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/node.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/filters.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/iterators.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/text.rs
+
+/home/cog/Pi Assisted Projects/lomi_win/target/debug/deps/libaccesskit_consumer-6cc27453daf6c1eb.rmeta: /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/lib.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/tree.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/node.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/filters.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/iterators.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/text.rs
+
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/lib.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/tree.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/node.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/filters.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/iterators.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/accesskit_consumer-0.16.1/src/text.rs:

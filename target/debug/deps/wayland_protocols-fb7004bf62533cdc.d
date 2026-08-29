@@ -1,0 +1,10 @@
+/home/cog/Pi Assisted Projects/lomi_win/target/debug/deps/wayland_protocols-fb7004bf62533cdc.d: /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/lib.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/protocol_macro.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/ext.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/wp.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/xdg.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/xwayland.rs
+
+/home/cog/Pi Assisted Projects/lomi_win/target/debug/deps/libwayland_protocols-fb7004bf62533cdc.rmeta: /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/lib.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/protocol_macro.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/ext.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/wp.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/xdg.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/xwayland.rs
+
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/lib.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/protocol_macro.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/ext.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/wp.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/xdg.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wayland-protocols-0.32.13/src/xwayland.rs:

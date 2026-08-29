@@ -105,6 +105,8 @@ enum Commands {
     WslBridge,
     /// Displays a live, interactive TUI dashboard (Lomi-Top)
     Top,
+    /// Launch the Native Desktop GUI
+    Gui,
 }
 
 #[derive(Deserialize, Debug)]
@@ -175,6 +177,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Top => {
             run_lomi_top().unwrap();
+        }
+        Commands::Gui => {
+            run_native_gui();
         }
         Commands::InstallDaemon => {
             install_daemon();
@@ -1257,37 +1262,53 @@ fn append_to_shadow_harvester(prompt: &str, completion: &str) {
 /// Swarm Compute: P2P distributed AI model sharding
 fn run_swarm_mode(mode: &str) {
     println!("🌐 LOMI PEER-TO-PEER SWARM COMPUTE ENGINE\n");
-    if mode == "host" {
-        println!("   📡 Starting Swarm Host on 0.0.0.0:8081...");
-        std::thread::sleep(std::time::Duration::from_millis(500));
-        println!("   [+] Node Connected: 192.168.1.14 (Desktop - 32GB RAM, RTX 3080)");
-        std::thread::sleep(std::time::Duration::from_millis(300));
-        println!("   [+] Node Connected: 192.168.1.22 (MacBook - 16GB RAM, Metal Unified)");
-        std::thread::sleep(std::time::Duration::from_millis(200));
-        println!("   [+] Local Node    : Office Laptop (8GB RAM, CPU)");
-        
-        // AI Tuner - Swarm Aggregation Logic
-        let total_ram_pool = 32 + 16 + 8;
-        let total_vram_pool = 10 + 16; 
-        
-        println!("\n   🧠 AI TUNER: Swarm Hardware Aggregated!");
-        println!("      └ Total Swarm Memory : {} GB", total_ram_pool);
-        println!("      └ Total Swarm VRAM   : {} GB", total_vram_pool);
-        
-        let target_model = if total_ram_pool > 40 { "Llama-3 70B (Int4 Quantized)" } else { "Mixtral 8x7B" };
-        println!("      └ Recommended Model  : {}", target_model);
-        
-        println!("\n   🚀 Distributing Tensor Layers across 3 nodes...");
-        println!("      - Layers 0-30  -> Desktop (GPU Accelerated)");
-        println!("      - Layers 31-60 -> MacBook (MPS Accelerated)");
-        println!("      - Layers 61-80 -> Local Laptop (CPU Compute)");
-        println!("\n   ✅ SWARM READY. Your network is now running a massive 70B parameter model!");
-    } else {
-        println!("   🔗 Joining Swarm at 192.168.1.x...");
-        std::thread::sleep(std::time::Duration::from_millis(600));
-        println!("   ✅ Connected to Host! Sharing 8GB local RAM with Swarm.");
-        println!("   ⏳ Awaiting tensor shards from Host node...");
-    }
+    let mode = mode.to_string();
+    tokio::runtime::Runtime::new().unwrap().block_on(async move {
+        let socket = tokio::net::UdpSocket::bind("0.0.0.0:0").await.unwrap();
+        socket.set_broadcast(true).unwrap();
+        if mode == "host" {
+            println!("   📡 Starting Swarm Host... Broadcasting discovery ping on port 8081.");
+            let bind_addr = "0.0.0.0:8081";
+            let recv_socket = tokio::net::UdpSocket::bind(bind_addr).await.unwrap();
+            
+            // Broadcast task
+            let socket_clone = tokio::net::UdpSocket::bind("0.0.0.0:0").await.unwrap();
+            socket_clone.set_broadcast(true).unwrap();
+            tokio::spawn(async move {
+                loop {
+                    let msg = b"LOMI_SWARM_DISCOVERY";
+                    let _ = socket_clone.send_to(msg, "255.255.255.255:8081").await;
+                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                }
+            });
+
+            // Listen task
+            let mut buf = [0; 1024];
+            println!("   [+] Awaiting connections...");
+            loop {
+                if let Ok((len, addr)) = recv_socket.recv_from(&mut buf).await {
+                    let text = String::from_utf8_lossy(&buf[..len]);
+                    if text == "LOMI_SWARM_JOIN" {
+                        println!("   [+] Node Connected: {}", addr);
+                    }
+                }
+            }
+        } else {
+            println!("   🔗 Joining Swarm... Listening for discovery pings.");
+            let bind_addr = "0.0.0.0:8081";
+            let recv_socket = tokio::net::UdpSocket::bind(bind_addr).await.unwrap();
+            let mut buf = [0; 1024];
+            if let Ok((len, addr)) = recv_socket.recv_from(&mut buf).await {
+                let text = String::from_utf8_lossy(&buf[..len]);
+                if text == "LOMI_SWARM_DISCOVERY" {
+                    println!("   ✅ Discovered Host at {}!", addr);
+                    let msg = b"LOMI_SWARM_JOIN";
+                    let _ = socket.send_to(msg, addr).await;
+                    println!("   ✅ Connected to Host! Sharing resources with Swarm.");
+                }
+            }
+        }
+    });
 }
 
 /// Infinite Memory: Builds a highly compressed Vector Database of the local codebase
@@ -1807,4 +1828,33 @@ fn download_model_from_hf(repo_id: &str) -> Result<std::path::PathBuf, Box<dyn s
     let repo = api.model(repo_id.to_string());
     let path = repo.get("model.safetensors")?;
     Ok(path)
+}
+
+/// Feature: Native GUI
+fn run_native_gui() {
+    println!("Launching Native GUI...");
+    let options = eframe::NativeOptions {
+        viewport: eframe::egui::ViewportBuilder::default().with_inner_size([800.0, 600.0]),
+        ..Default::default()
+    };
+    let _ = eframe::run_native(
+        "Lomi OS",
+        options,
+        Box::new(|_cc| Box::new(LomiGuiApp::default())),
+    );
+}
+
+#[derive(Default)]
+struct LomiGuiApp {}
+
+impl eframe::App for LomiGuiApp {
+    fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame) {
+        eframe::egui::CentralPanel::default().show(ctx, |ui| {
+            ui.heading("Lomi OS - Advanced AI Tuner");
+            ui.label("Welcome to the Native Desktop GUI.");
+            if ui.button("Close").clicked() {
+                ctx.send_viewport_cmd(eframe::egui::ViewportCommand::Close);
+            }
+        });
+    }
 }
