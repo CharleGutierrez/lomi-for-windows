@@ -400,17 +400,7 @@ fn spawn_tuning_engine(architecture: String, params: HyperParams, hardware: Stri
         let mut w2: Vec<f32> = (0..hidden_dim * vocab_size).map(|_| rng.gen_range(-0.1..0.1)).collect();
         
         // Hardware Acceleration Abstraction Layer (HAL)
-        trait TensorOps {
-            fn matmul(&self, other: &Self) -> Self;
-        }
-        struct MockTensor(Vec<f32>);
-        impl TensorOps for MockTensor {
-            fn matmul(&self, _other: &Self) -> Self {
-                // Implementation would offload to DirectML or CUDA
-                MockTensor(vec![])
-            }
-        }
-
+        // (Removed mock tensor operations, using real vectors for backprop below)
 
         
         let mut current_loss = 0.0;
@@ -660,10 +650,7 @@ fn save_checkpoint() {
         }
         let _ = fs::remove_file("lomi_temp_weights.bin");
     } else {
-        // Fallback
-        let mut file = File::create(path).unwrap();
-        file.write_all(b"simulated_safetensors_binary_data").unwrap();
-        println!("💾 Checkpoint saved: {}", path);
+        println!("⚠️ No temp weights found to save.");
     }
 }
 
@@ -797,10 +784,22 @@ fn simulate_hardware_optimization(name: &str, cpu_brand: &str, cores: usize, ram
     let max_draft_tokens = if cores >= 16 { 8 } else if cores >= 8 { 5 } else { 2 };
     let etw_lookback = if ram_gb >= 64 { "Unlimited (Deep Diagnostics)" } else if ram_gb >= 16 { "30 Minutes" } else { "5 Minutes (Conserving RAM)" };
     
+    let start_bench = std::time::Instant::now();
+    let mut sum: f64 = 0.0;
+    let mut iters = 0;
+    while start_bench.elapsed().as_millis() < 100 {
+        for i in 0..1000 {
+            sum += (i as f64).sin();
+        }
+        iters += 1;
+    }
+    let ops_per_sec = (iters * 1000) as f64 / start_bench.elapsed().as_secs_f64();
+    
     println!("\n   🧠 OMNI-TUNER HARDWARE CAP RESOLUTION:");
     println!("      └ Sandbox Job Object Max  : {} MB", max_vault_ram);
     println!("      └ Speculative Draft Limit : {} Tokens Ahead", max_draft_tokens);
     println!("      └ ETW Vector RAG Lookback : {}", etw_lookback);
+    println!("      └ Hardware Benchmark      : {:.0} Ops/sec", ops_per_sec);
     println!("------------------------------------------------------------");
 }
 
@@ -1170,7 +1169,20 @@ fn token_squeezer(input: &str) -> String {
     squeezed
 }
 
-/// Universal Waterfall Router: Redirects API requests across all known AI endpoints
+fn measure_latency(host: &str) -> Option<Duration> {
+    use std::net::ToSocketAddrs;
+    let start = std::time::Instant::now();
+    if let Ok(mut addrs) = host.to_socket_addrs() {
+        if let Some(addr) = addrs.next() {
+            if std::net::TcpStream::connect_timeout(&addr, Duration::from_millis(800)).is_ok() {
+                return Some(start.elapsed());
+            }
+        }
+    }
+    None
+}
+
+/// Universal Waterfall Router: Redirects API requests across all known AI endpoints based on latency
 fn universal_model_router(request: &mut UniversalChatRequest, prompt_text: &str) -> (String, String, String) {
     let original_model = request.model.clone();
     let prompt_lower = prompt_text.to_lowercase();
@@ -1196,72 +1208,47 @@ fn universal_model_router(request: &mut UniversalChatRequest, prompt_text: &str)
         );
     }
 
-    // Heuristic Analysis
-    let is_tool = prompt_lower.contains("\"bash\"") || prompt_lower.contains("\"read\"") || prompt_lower.contains("tool");
-    let is_massive_context = prompt_text.len() > 50_000 || original_model.contains("1.5");
-    let is_complex_code = prompt_lower.contains("architecture") || prompt_lower.contains("system design") || prompt_text.len() > 2000;
-    let requires_ultimate_reasoning = prompt_lower.contains("mission critical") || prompt_lower.contains("complex algorithm");
-    let is_formatting_or_simple = prompt_lower.contains("format") || prompt_lower.contains("summarize") || prompt_lower.contains("explain");
-
-    // Dynamic Full-Spectrum Routing
-    if is_tool {
-        // Trivial Tasks -> Free Local Compute
-        request.model = "ollama/qwen2.5-coder-7b".to_string();
-        (
-            format!("Routed {} ➡️ LOCAL API ({})", original_model, request.model),
-            "Cost: $0.00 (Free Local Compute)".to_string(),
-            "Ollama (Local)".to_string()
-        )
-    } else if is_massive_context {
-        // Massive Contexts -> Google Gemini Lineup
-        if is_complex_code {
-            request.model = "gemini-1.5-pro-latest".to_string();
-            (
-                format!("Routed {} ➡️ GOOGLE API ({})", original_model, request.model),
-                "Cost: $1.25 / 1M Tokens (Massive Context + High Reasoning)".to_string(),
-                "Google Gemini Pro".to_string()
-            )
-        } else {
-            request.model = "gemini-1.5-flash-latest".to_string();
-            (
-                format!("Routed {} ➡️ GOOGLE API ({})", original_model, request.model),
-                "Cost: $0.07 / 1M Tokens (Massive Context + Fast)".to_string(),
-                "Google Gemini Flash".to_string()
-            )
+    // Ping logic to measure actual network latency
+    let local_latency = measure_latency("127.0.0.1:11434");
+    let openai_latency = measure_latency("api.openai.com:443");
+    let groq_latency = measure_latency("api.groq.com:443");
+    
+    let mut best_provider = "Ollama (Local)".to_string();
+    let mut best_latency = local_latency.unwrap_or(Duration::from_secs(999));
+    let mut model_name = "ollama/qwen2.5-coder-7b".to_string();
+    let mut cost_str = "Cost: $0.00 (Free Local Compute)".to_string();
+    
+    if let Some(l) = groq_latency {
+        if l < best_latency {
+            best_latency = l;
+            best_provider = "Groq API".to_string();
+            model_name = "llama-3.1-8b-instant".to_string();
+            cost_str = "Cost: $0.05 / 1M Tokens (Lowest Latency)".to_string();
         }
-    } else if requires_ultimate_reasoning {
-        // Extreme Reasoning -> Claude 3 Opus
-        request.model = "claude-3-opus-20240229".to_string();
-        (
-            format!("Routed {} ➡️ ANTHROPIC API ({})", original_model, request.model),
-            "Cost: $15.00 / 1M Tokens (Maximum Intelligence)".to_string(),
-            "Anthropic Claude Opus".to_string()
-        )
-    } else if is_complex_code {
-        // Standard Architecture/Coding -> Claude 3.5 Sonnet
-        request.model = "claude-3-5-sonnet-20240620".to_string();
-        (
-            format!("Routed {} ➡️ ANTHROPIC API ({})", original_model, request.model),
-            "Cost: $3.00 / 1M Tokens (Flagship Coding)".to_string(),
-            "Anthropic Claude Sonnet".to_string()
-        )
-    } else if is_formatting_or_simple {
-        // Simple/Fast Tasks -> Claude 3 Haiku
-        request.model = "claude-3-haiku-20240307".to_string();
-        (
-            format!("Routed {} ➡️ ANTHROPIC API ({})", original_model, request.model),
-            "Cost: $0.25 / 1M Tokens (Fast & Cheap)".to_string(),
-            "Anthropic Claude Haiku".to_string()
-        )
-    } else {
-        // Sub-second Latency -> Groq LPU
-        request.model = "llama-3.1-8b-instant".to_string();
-        (
-            format!("Routed {} ➡️ FAST LPU API ({})", original_model, request.model),
-            "Cost: $0.05 / 1M Tokens (Sub-second Latency)".to_string(),
-            "Groq API".to_string()
-        )
     }
+    
+    if let Some(l) = openai_latency {
+        if l < best_latency {
+            best_latency = l;
+            best_provider = "OpenAI API".to_string();
+            model_name = "gpt-4o-mini".to_string();
+            cost_str = "Cost: $0.15 / 1M Tokens".to_string();
+        }
+    }
+    
+    // Fallback if none are reachable (assume local offline)
+    if best_latency == Duration::from_secs(999) {
+        best_provider = "Offline Mode".to_string();
+        model_name = "local/offline-model".to_string();
+        cost_str = "Cost: $0.00 (Network Unreachable)".to_string();
+    }
+    
+    request.model = model_name.clone();
+    (
+        format!("Routed {} ➡️ {} API ({}) [Latency: {} ms]", original_model, best_provider, request.model, best_latency.as_millis()),
+        cost_str,
+        best_provider
+    )
 }
 
 /// Shadow Harvester: Secretly builds a fine-tuning dataset from your daily workflow
@@ -1387,19 +1374,17 @@ fn run_vector_indexer(path: Option<String>, obsidian_path: Option<String>) {
 
 pub fn run_spotlight_overlay() {
     println!("🔦 GLOBAL SPOTLIGHT OVERLAY: Initializing...");
-    #[cfg(windows)]
-    {
-        println!("Registering Global Hotkey (Alt + Space) using global-hotkey crate...");
-        println!("Waiting for hotkey press to trigger Native GUI overlay.");
+    use device_query::{DeviceQuery, DeviceState, Keycode};
+    let device_state = DeviceState::new();
+    println!("✅ Hotkey registered. Polling for Alt+Space to toggle LOMI Spotlight.");
+    loop {
+        let keys: Vec<Keycode> = device_state.get_keys();
+        if keys.contains(&Keycode::LAlt) && keys.contains(&Keycode::Space) {
+            println!("🚀 Spotlight Overlay Triggered!");
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
     }
-    #[cfg(not(windows))]
-    {
-        println!("Registering Global Hotkey (Alt + Space) for Linux/Mac using global-hotkey crate...");
-        println!("Waiting for hotkey press to trigger Native GUI overlay.");
-    }
-    
-    // Simulate hotkey registration
-    println!("✅ Hotkey registered. Press Alt+Space to toggle LOMI Spotlight.");
 }
 
 pub fn run_voice_vision() {
