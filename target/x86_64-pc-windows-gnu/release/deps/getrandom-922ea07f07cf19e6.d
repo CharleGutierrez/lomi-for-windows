@@ -1,0 +1,11 @@
+/home/cog/Pi Assisted Projects/lomi_win/target/x86_64-pc-windows-gnu/release/deps/getrandom-922ea07f07cf19e6.d: /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error_impls.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/windows.rs
+
+/home/cog/Pi Assisted Projects/lomi_win/target/x86_64-pc-windows-gnu/release/deps/libgetrandom-922ea07f07cf19e6.rlib: /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error_impls.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/windows.rs
+
+/home/cog/Pi Assisted Projects/lomi_win/target/x86_64-pc-windows-gnu/release/deps/libgetrandom-922ea07f07cf19e6.rmeta: /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error_impls.rs /home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/windows.rs
+
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error_impls.rs:
+/home/cog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/windows.rs:
