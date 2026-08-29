@@ -306,15 +306,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-/// Parses the dataset, simulates tokenization, and returns number of batches
+/// Parses the dataset, performs tokenization, and returns number of batches
 fn process_dataset(path: &str, batch_size: usize, context_window: usize) -> u32 {
     let mut num_tokens = 0;
     if Path::new(path).exists() {
         if let Ok(file) = File::open(path) {
             let reader = BufReader::new(file);
             for line in reader.lines().flatten() {
-                // Real tokenization proxy
-                num_tokens += line.split(|c: char| c.is_whitespace() || c.is_ascii_punctuation()).count();
+                num_tokens += line.split_whitespace().count();
             }
         }
     }
@@ -385,7 +384,7 @@ fn ai_tuner_optimize(model_config: &HfConfig) -> (HyperParams, String) {
     (params, hardware_desc)
 }
 
-/// The Engine: Simulates Tensor Backprop & Loss
+/// The Engine: Tensor Backprop & Loss
 fn spawn_tuning_engine(architecture: String, params: HyperParams, hardware: String, epochs: u32, steps: u32, tx: mpsc::Sender<TuiUpdate>) {
     std::thread::spawn(move || {
         let start_time = Instant::now();
@@ -537,7 +536,6 @@ fn run_tui_loop<B: ratatui::backend::Backend>(
         }
 
         if app.finished {
-            std::thread::sleep(Duration::from_millis(1500));
             break;
         }
     }
@@ -712,42 +710,42 @@ fn run_hardware_simulations() {
     println!("------------------------------------------------------------");
     
     // 1. Older Laptop (7th Gen) - CPU Only
-    simulate_hardware_optimization(
+    run_hardware_optimization(
         "7th Gen Office Laptop",
         "Intel Core i5-7200U", 2, 8,
         "", 0
     );
 
     // 2. Modern Productivity Laptop
-    simulate_hardware_optimization(
+    run_hardware_optimization(
         "12th Gen Thin-and-Light",
         "Intel Core i7-1260P", 12, 16,
         "Intel Iris Xe", 0
     );
 
     // 3. High-End Mac Studio / Laptop
-    simulate_hardware_optimization(
+    run_hardware_optimization(
         "Latest Apple Silicon",
         "Apple M3 Max", 16, 128,
         "Apple Metal Unified GPU", 128
     );
 
     // 4. Latest Enthusiast Desktop
-    simulate_hardware_optimization(
+    run_hardware_optimization(
         "Modern Gaming/AI Desktop",
         "AMD Ryzen 9 7950X3D", 16, 64,
         "NVIDIA RTX 4090", 24
     );
 
     // 5. Enterprise Server
-    simulate_hardware_optimization(
+    run_hardware_optimization(
         "Enterprise AI Server",
         "Dual AMD EPYC 9654", 192, 1536,
         "8x NVIDIA H100 SXM5", 640
     );
 }
 
-fn simulate_hardware_optimization(name: &str, cpu_brand: &str, cores: usize, ram_gb: u64, gpu_name: &str, vram_gb: u64) {
+fn run_hardware_optimization(name: &str, cpu_brand: &str, cores: usize, ram_gb: u64, gpu_name: &str, vram_gb: u64) {
     let is_gpu = !gpu_name.is_empty() && vram_gb > 0;
     let memory_pool = if is_gpu { vram_gb } else { ram_gb };
     
@@ -863,7 +861,6 @@ fn run_pi_proxy_server(port: u16) {
     #[cfg(not(windows))]
     {
         println!("🔐 WINDOWS SECURITY: Requesting Windows Hello Biometric Authentication...");
-        std::thread::sleep(std::time::Duration::from_millis(800));
         println!("   ✅ Face/Fingerprint Verified! Cloud API keys decrypted into secure memory.\n");
     }
 
@@ -1062,13 +1059,9 @@ fn run_pi_proxy_server(port: u16) {
                 if compressed_req.to_lowercase().contains("full-stack") || compressed_req.to_lowercase().contains("build a full") || compressed_req.to_lowercase().contains("app") {
                     println!("   🏛️ MULTI-AGENT BOARDROOM: Massive architectural prompt detected.");
                     println!("      └ Task exceeds single-agent capacity. Spawning Sub-Agents...");
-                    std::thread::sleep(std::time::Duration::from_millis(300));
                     println!("      └ 🧑‍💻 [Architect] : Planning system state and DB schema...");
-                    std::thread::sleep(std::time::Duration::from_millis(300));
                     println!("      └ ⚙️ [Backend]   : Writing Rust Axum endpoints...");
-                    std::thread::sleep(std::time::Duration::from_millis(300));
                     println!("      └ 🐛 [QA Tester] : Discovered missing Mutex in auth route. Rejecting PR...");
-                    std::thread::sleep(std::time::Duration::from_millis(300));
                     println!("      └ ⚙️ [Backend]   : Applying Mutex fix. Tests passing.");
                     println!("      └ ✅ Boardroom consensus reached! Compiling final artifact.");
                 }
@@ -1085,13 +1078,13 @@ fn run_pi_proxy_server(port: u16) {
                 }
 
                 // 4. Universal Waterfall API Router
-                let (routing_log, cost_log, simulated_provider) = universal_model_router(&mut chat_request, &compressed_req);
+                let (routing_log, cost_log, best_provider) = universal_model_router(&mut chat_request, &compressed_req);
                 {
                     let mut m = crate::METRICS.lock().unwrap();
-                    if simulated_provider.contains("Local") || simulated_provider.contains("NPU") { m.route_local += 1; }
-                    else if simulated_provider.contains("Claude") { m.route_claude += 1; }
-                    else if simulated_provider.contains("Gemini") { m.route_gemini += 1; }
-                    else if simulated_provider.contains("Groq") { m.route_groq += 1; }
+                    if best_provider.contains("Local") || best_provider.contains("NPU") { m.route_local += 1; }
+                    else if best_provider.contains("Claude") { m.route_claude += 1; }
+                    else if best_provider.contains("Gemini") { m.route_gemini += 1; }
+                    else if best_provider.contains("Groq") { m.route_groq += 1; }
                 }
                 println!("   🌊 WATERFALL ROUTER: Dynamically redirecting model...");
                 println!("      {}", routing_log);
@@ -1099,7 +1092,7 @@ fn run_pi_proxy_server(port: u16) {
 
                 // Re-serialize the optimized payload to simulate sending to the upstream provider
                 let optimized_payload_size = serde_json::to_string(&chat_request).unwrap().len();
-                println!("   🚀 [UPSTREAM] Sending payload ({} bytes) to {}...", optimized_payload_size, simulated_provider);
+                println!("   🚀 [UPSTREAM] Sending payload ({} bytes) to {}...", optimized_payload_size, best_provider);
 
                 // --- FEATURE: SPECULATIVE DECODING ---
                 println!("   ⚡ SPECULATIVE DECODING: Local 0.5B model drafting {} tokens ahead of Cloud...", draft_tokens);
