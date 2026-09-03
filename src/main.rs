@@ -2120,5 +2120,3 @@ impl eframe::App for LomiGuiApp {
         });
     }
 }
-
-// [LOMI GENESIS PROTOCOL] Self-improvement pass completed at 2026-08-29T02:22:06.588020604+00:00. Optimized internal memory allocation.

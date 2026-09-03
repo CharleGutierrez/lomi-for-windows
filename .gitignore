@@ -2,3 +2,8 @@
 .projectmem/watch.pid
 .projectmem/watch.log
 .projectmem/structure.json
+
+target/
+
+ollama.zip
+ollama-bin/

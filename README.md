@@ -20,6 +20,15 @@
 
 ---
 
+## 🚀 What's New in v0.1.0 (Latest Release)
+- **LOMI Genesis Auto-Improvement:** Autonomous self-upgrading GitOps protocol (`genesis` subcommand).
+- **Final OS Layer Integration:** Includes `auto-heal` watchdog, `iotbridge` mDNS discovery, and raw `gpu-kernel` programming.
+- **Enhanced CLI & Swarm:** `swarm` node fallback capabilities, and custom web dashboard port configuration (`serve-proxy --dashboard-port`).
+- **Web & Desktop Ecosystem:** Autonomous web scraping agent (`web-agent`), global Spotlight search overlay (`spotlight`), and Obsidian markdown vault synchronization (`index`).
+- **Comprehensive Test Suite:** Full integration testing matrix across all 16 subcommands guaranteeing Windows 11 compatibility.
+
+---
+
 ## 📋 Table of Contents
 - [✨ Core Feature Showcase](#-core-feature-showcase)
 - [⚡ Quick Start & Installation](#-quick-start--installation)
